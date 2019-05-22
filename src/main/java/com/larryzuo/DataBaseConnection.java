@@ -1,0 +1,53 @@
+package com.larryzuo;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DataBaseConnection {
+
+    private Connection myConn;
+    private Statement myStmt;
+    private PreparedStatement PreStmt;
+    private ResultSet myRs;
+
+    public DataBaseConnection(String hostName, String userName, String passWord){
+
+        try{
+            myConn = DriverManager.getConnection(hostName,userName,passWord);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    ArrayList<String> getResultSet(String sqlCommand, String columnName){
+
+        ArrayList<String> tempStrList = new ArrayList<>();
+
+        try {
+            myStmt = myConn.createStatement();
+
+            myRs = myStmt.executeQuery(sqlCommand);
+
+            while(myRs.next()){
+                tempStrList.add(myRs.getString(columnName));
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return tempStrList;
+
+    }
+
+    void connectionClose(){
+
+        try {
+            myConn.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+}

@@ -15,9 +15,11 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class Main extends Application {
+
 
     private VBox myVBox;
     private HBox myHBox;
@@ -30,14 +32,20 @@ public class Main extends Application {
     private ResultSet myRs;
     private PreparedStatement PreStmt;
 
+
     private Stack<VBox> myStack = new Stack<>();
     private Stack<VBox> sortStack = new Stack<>();
 
     HBox hboxSortButton;
     HBox hboxSortByLocation;
 
+    final String hostName = "jdbc:mysql://52.14.102.120/cs370";
+    final String userName = "yuezuo";
+    final String passWord = "cs370";
+
     @Override
     public void start(Stage primaryStage) throws Exception{
+
         primaryStage.setTitle("Restaurant Application");
 
         Menu startMenu = new Menu("Start");
@@ -65,10 +73,9 @@ public class Main extends Application {
         rootPane = new Pane();
         myVBox = new VBox(2);
 
-        myVBox.getChildren().addAll(menuBar);
+        myVBox.getChildren().add(menuBar);
 
         rootPane.getChildren().addAll(myVBox);
-
         myScene = new Scene(rootPane,600,400);
         primaryStage.setScene(myScene);
         primaryStage.show();
@@ -145,31 +152,16 @@ public class Main extends Application {
 
 
             // rest_data in radio button; connection to the database;
+            DataBaseConnection dataConnction = new DataBaseConnection(hostName,userName,passWord);
+            ArrayList<String> radStr = new ArrayList<>();
+            String sqlCommand = "select rest_name from restaurant";
+            String columnName = "rest_name";
 
-            String holdStr;
-            final ArrayList<String> radStr = new ArrayList<>();
+            radStr = dataConnction.getResultSet(sqlCommand,columnName);
 
-            try{
-                myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                        "yuezuo","cs370");
-                myStmt = myConn.createStatement();
+            radioButtons = new RadioButton[radStr.size()];
 
-                myRs = myStmt.executeQuery("select * from restaurant");
-
-                while(myRs.next()){
-
-                    holdStr = myRs.getString("rest_name");
-
-                    radStr.add(holdStr);
-                }
-
-                radioButtons = new RadioButton[radStr.size()];
-
-                myConn.close();
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            dataConnction.connectionClose();
 
             radioGroup = new ToggleGroup();
 
