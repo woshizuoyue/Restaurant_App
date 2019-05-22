@@ -42,6 +42,7 @@ public class Main extends Application {
     final String hostName = "jdbc:mysql://52.14.102.120/cs370";
     final String userName = "yuezuo";
     final String passWord = "cs370";
+    private DataBaseConnection dataConnction;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -152,8 +153,11 @@ public class Main extends Application {
 
 
             // rest_data in radio button; connection to the database;
-            DataBaseConnection dataConnction = new DataBaseConnection(hostName,userName,passWord);
+            dataConnction = new DataBaseConnection();
+            dataConnction.connectionOpen(hostName,userName,passWord);
+
             ArrayList<String> radStr = new ArrayList<>();
+
             String sqlCommand = "select rest_name from restaurant";
             String columnName = "rest_name";
 
@@ -195,31 +199,20 @@ public class Main extends Application {
 
                     sortStack.push(myVBox);
 
-
                     ArrayList<String> tempStr = new ArrayList<>();
 
-                    try{
-                        myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                                "yuezuo","cs370");
+                    String sqlCommand = "select rest_name from restaurant " +
+                            "group by rest_name " +
+                            "order by rest_name ";
+                    String columnName = "rest_name";
 
-                        myStmt = myConn.createStatement();
+                    dataConnction.connectionOpen(hostName,userName,passWord);
 
-                        myRs = myStmt.executeQuery("select rest_name from restaurant " +
-                                "group by rest_name " +
-                                "order by rest_name ");
+                    tempStr = dataConnction.getResultSet(sqlCommand,columnName);
 
-                        while (myRs.next()){
+                    radioButtons = new RadioButton[tempStr.size()];
 
-                            tempStr.add(myRs.getString("rest_name"));
-
-                        }
-
-                        radioButtons = new RadioButton[tempStr.size()];
-
-                        myConn.close();
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
+                    dataConnction.connectionClose();
 
                     radioGroup = new ToggleGroup();
                     for(int i=0;i<tempStr.size();i++)
@@ -256,35 +249,24 @@ public class Main extends Application {
             sortByNameDesc.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
-                    sortStack.push(myVBox);
 
+                    sortStack.push(myVBox);
 
                     ArrayList<String> tempStr = new ArrayList<>();
 
-                    try{
-                        myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                                "yuezuo","cs370");
+                    String sqlCommand = "select rest_name from restaurant " +
+                            "group by rest_name " +
+                            "order by rest_name desc ";
 
-                        myStmt = myConn.createStatement();
+                    String restName = "rest_name";
 
-                        myRs = myStmt.executeQuery("select rest_name from restaurant " +
-                                "group by rest_name " +
-                                "order by rest_name desc ");
+                    dataConnction.connectionOpen(hostName,userName,passWord);
+                    tempStr = dataConnction.getResultSet(sqlCommand,restName);
 
-                        while (myRs.next()){
-
-                            tempStr.add(myRs.getString("rest_name"));
-
-                        }
-
-                        radioButtons = new RadioButton[tempStr.size()];
-
-                        myConn.close();
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
+                    radioButtons = new RadioButton[tempStr.size()];
 
                     radioGroup = new ToggleGroup();
+
                     for(int i=0;i<tempStr.size();i++)
                     {
                         radioButtons[i] = new RadioButton(tempStr.get(i));
@@ -415,9 +397,6 @@ public class Main extends Application {
 
                 }
             });
-
-
-
 
             myHBox.getChildren().addAll(cust_back,sortByNameAsc,sortByNameDesc);
             myVBox.getChildren().add(myHBox);

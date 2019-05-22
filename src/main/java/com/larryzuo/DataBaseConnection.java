@@ -2,7 +2,6 @@ package com.larryzuo;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class DataBaseConnection {
 
@@ -11,10 +10,12 @@ public class DataBaseConnection {
     private PreparedStatement PreStmt;
     private ResultSet myRs;
 
-    public DataBaseConnection(String hostName, String userName, String passWord){
+    void connectionOpen(String hostName, String userName, String passWord){
 
-        try{
+        try {
+
             myConn = DriverManager.getConnection(hostName,userName,passWord);
+
         }catch (Exception e){
             e.printStackTrace();
         }
