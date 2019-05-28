@@ -318,6 +318,7 @@ public class Main extends Application {
                         myRs = myStmt.executeQuery("select rest_address from restaurant");
 
                         while(myRs.next()) {
+                            String go;
 
                             String strAddress = myRs.getString("rest_address");
                             String tempStrX = strAddress.split("-")[0];
