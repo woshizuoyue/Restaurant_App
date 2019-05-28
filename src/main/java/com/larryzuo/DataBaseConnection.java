@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 public class DataBaseConnection {
 
-    private Connection myConn;
+    public Connection myConn;
     private Statement myStmt;
-    private PreparedStatement PreStmt;
+    public PreparedStatement PreStmt;
     private ResultSet myRs;
 
     void connectionOpen(String hostName, String userName, String passWord){

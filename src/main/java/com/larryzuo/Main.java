@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 public class Main extends Application {
@@ -26,12 +25,6 @@ public class Main extends Application {
     private Stage myStage;
     private Scene myScene;
     private Pane rootPane;
-
-    private Connection myConn;
-    private Statement myStmt;
-    private ResultSet myRs;
-    private PreparedStatement PreStmt;
-
 
     private Stack<VBox> myStack = new Stack<>();
     private Stack<VBox> sortStack = new Stack<>();
@@ -305,68 +298,53 @@ public class Main extends Application {
                     int tempXAdd;
                     int tempYAdd;
                     double rest_dist;
+                    String tempStrX, tempStrY;
 
                     ArrayList<String> tempStr = new ArrayList<>();
+                    ArrayList<String> gatherStr;
+
+                    String sql = "select rest_address from restaurant";
+                    String preparedSQL = "update restaurant " +
+                            "set rest_dist = ? " +
+                            "where rest_id = ? ";
+                    String dist_sql = "select rest_name from restaurant " +
+                            "order by rest_dist ";
 
 
-                    try{
-                        myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120/cs370",
-                                "yuezuo","cs370");
+                    dataConnction.connectionOpen(hostName,userName,passWord);
 
-                        myStmt = myConn.createStatement();
+                    gatherStr = dataConnction.getResultSet(sql, "rest_address");
 
-                        myRs = myStmt.executeQuery("select rest_address from restaurant");
+                    while(!gatherStr.isEmpty()) {
 
-                        while(myRs.next()) {
-                            String go;
+                        String removedStr = gatherStr.remove(0);
+                        tempStrX = removedStr.split("-")[0];
+                        tempStrY = removedStr.split("-")[1].split("S")[0];
 
-                            String strAddress = myRs.getString("rest_address");
-                            String tempStrX = strAddress.split("-")[0];
-                            String tempStrY = strAddress.split("-")[1].split("S")[0];
+                        tempXAdd = Integer.parseInt(tempStrX);
+                        tempYAdd = Integer.parseInt(tempStrY);
 
-                            tempXAdd = Integer.parseInt(tempStrX);
-                            tempYAdd = Integer.parseInt(tempStrY);
+                        int restID = Integer.parseInt(tempStrX + tempStrY);
 
-                            int restID = Integer.parseInt(tempStrX + tempStrY);
+                        rest_dist = Math.sqrt((tempXAdd - xTarget) * (tempXAdd - xTarget) +
+                                (tempYAdd - yTarget) * (tempYAdd - yTarget));
 
-                            rest_dist = Math.sqrt((tempXAdd - xTarget) * (tempXAdd - xTarget) +
-                                    (tempYAdd - yTarget) * (tempYAdd - yTarget));
-
-                            PreStmt = myConn.prepareStatement(
-
-                                    "update restaurant " +
-                                            "set rest_dist = ? " +
-                                            "where rest_id = ? "
-                            );
-
-
-                            PreStmt.setDouble(1,rest_dist);
-                            PreStmt.setInt(2,restID);
-
-                            PreStmt.executeUpdate();
-
+                        // need to refactoring;
+                        try {
+                            dataConnction.PreStmt = dataConnction.myConn.prepareStatement(preparedSQL);
+                            dataConnction.PreStmt.setDouble(1,rest_dist);
+                            dataConnction.PreStmt.setInt(2,restID);
+                            dataConnction.PreStmt.executeUpdate();
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
 
-                        myStmt = myConn.createStatement();
-
-                        myRs = myStmt.executeQuery(
-
-                                "select rest_name from restaurant " +
-                                        "order by rest_dist "
-                        );
-
-                        while (myRs.next()){
-                            tempStr.add(myRs.getString("rest_name"));
-                        }
-
+                        tempStr = dataConnction.getResultSet(dist_sql,"rest_name");
                         radioButtons = new RadioButton[tempStr.size()];
 
-                        myConn.close();
-
-                    }catch (Exception e){
-
-                        e.printStackTrace();
                     }
+
+                    dataConnction.connectionClose();
 
                     radioGroup = new ToggleGroup();
                     for(int i=0;i<tempStr.size();i++)
@@ -491,7 +469,6 @@ public class Main extends Application {
 
         }
     }
-
 
     public static void main(String[] args) {
         launch(args);
