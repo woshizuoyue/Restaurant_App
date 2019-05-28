@@ -39,7 +39,7 @@ public class Main extends Application {
     HBox hboxSortButton;
     HBox hboxSortByLocation;
 
-    final String hostName = "jdbc:mysql://52.14.102.120/cs370";
+    final String hostName = "jdbc:mysql://35.225.192.66/cs370";
     final String userName = "yuezuo";
     final String passWord = "cs370";
     private DataBaseConnection dataConnction;
@@ -150,11 +150,10 @@ public class Main extends Application {
             hboxSortByLocation.setSpacing(5);
             hboxSortByLocation.setAlignment(Pos.CENTER);
 
-
-
             // rest_data in radio button; connection to the database;
             dataConnction = new DataBaseConnection();
             dataConnction.connectionOpen(hostName,userName,passWord);
+
 
             ArrayList<String> radStr = new ArrayList<>();
 
@@ -333,6 +332,7 @@ public class Main extends Application {
                                     (tempYAdd - yTarget) * (tempYAdd - yTarget));
 
                             PreStmt = myConn.prepareStatement(
+
                                     "update restaurant " +
                                             "set rest_dist = ? " +
                                             "where rest_id = ? "
