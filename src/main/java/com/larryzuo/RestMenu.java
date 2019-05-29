@@ -46,52 +46,54 @@ public class RestMenu {
         ArrayList<String> itemStr = new ArrayList<>();
         ArrayList<String> infoStr = new ArrayList<>();
 
+        final String hostName = "jdbc:mysql://35.225.192.66/cs370";
+        final String userName = "yuezuo";
+        final String passWord = "cs370";
+
+        DataBaseConnection dataBaseConnection = new DataBaseConnection();
+        dataBaseConnection.connectionOpen(hostName,userName,passWord);
+        String preparedSQL = "select menu.dish_name, menu.dish_price " +
+                "from menu, restaurant, rest_menu " +
+                "where menu.dish_id = rest_menu.dish_id and " +
+                "rest_menu.rest_id = restaurant.rest_id and " +
+                "restaurant.rest_name = ? ";
+        String preparedSQL2 = "select rest_address, open_hour, close_hour, close_day " +
+                "from restaurant where rest_name = ? ";
+
+        // need to refactoring;
         try {
-            myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370", "yuezuo", "cs370");
+            dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
 
-            myPreStmt = myConn.prepareStatement(
+            dataBaseConnection.PreStmt.setString(1,restName);
 
-                    "select menu.dish_name, menu.dish_price " +
-                    "from menu,restaurant,rest_menu " +
-                    "where menu.dish_id = rest_menu.dish_id and " +
-                    "rest_menu.rest_id = restaurant.rest_id and " +
-                            "restaurant.rest_name = ? ");
+            dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-            myPreStmt.setString(1,restName);
+            while (dataBaseConnection.myRs.next()){
 
-            myRs = myPreStmt.executeQuery();
-
-            while (myRs.next()){
-
-               String menuName = myRs.getString("dish_name");
-               double price = myRs.getDouble("dish_price");
+               String menuName = dataBaseConnection.myRs.getString("dish_name");
+               double price = dataBaseConnection.myRs.getDouble("dish_price");
 
                itemStr.add(menuName+" ----------- "+price);
             }
 
-            myPreStmt = myConn.prepareStatement(
+            dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
 
-                    "select rest_address, open_hour, close_hour, close_day " +
-                            "from restaurant " +
-                            "where rest_name = ? "
-            );
+            dataBaseConnection.PreStmt.setString(1,restName);
 
-            myPreStmt.setString(1,restName);
+            dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-            myRs = myPreStmt.executeQuery();
+            while(dataBaseConnection.myRs.next()){
 
-            while(myRs.next()){
-
-                String address = myRs.getString("rest_address");
-                String openHour = myRs.getString("open_hour");
-                String closeHour = myRs.getString("close_hour");
-                String closeDay = myRs.getString("close_day");
+                String address = dataBaseConnection.myRs.getString("rest_address");
+                String openHour = dataBaseConnection.myRs.getString("open_hour");
+                String closeHour = dataBaseConnection.myRs.getString("close_hour");
+                String closeDay = dataBaseConnection.myRs.getString("close_day");
 
                 String info = address+" ------ "+"Open: "+openHour+", "+"Close: "+closeHour+", "+"Close Day: "+closeDay;
                 infoStr.add(info);
             }
 
-            myConn.close();
+            dataBaseConnection.connectionClose();
         }catch (Exception e){
 
             e.printStackTrace();
@@ -116,6 +118,4 @@ public class RestMenu {
         menuPane.getChildren().add(menuVBox);
 
     }
-
-
 }

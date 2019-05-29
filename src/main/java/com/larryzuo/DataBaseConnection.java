@@ -8,7 +8,7 @@ public class DataBaseConnection {
     public Connection myConn;
     private Statement myStmt;
     public PreparedStatement PreStmt;
-    private ResultSet myRs;
+    public ResultSet myRs;
 
     void connectionOpen(String hostName, String userName, String passWord){
 
