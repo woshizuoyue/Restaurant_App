@@ -435,7 +435,7 @@ public class Main extends Application {
 
                         stage.close();
 
-                        AdminRest adRest = new AdminRest();
+                        new AdminRest();
                     }
                     else{
 

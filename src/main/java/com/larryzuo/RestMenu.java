@@ -7,7 +7,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
-import java.sql.*;
 import java.util.ArrayList;
 
 public class RestMenu {
@@ -18,10 +17,6 @@ public class RestMenu {
     VBox menuVBox;
 
     String restName;
-
-    Connection myConn;
-    PreparedStatement myPreStmt;
-    ResultSet myRs;
 
     public RestMenu(String str){
 
@@ -98,6 +93,7 @@ public class RestMenu {
 
             e.printStackTrace();
         }
+
 
         menuVBox = new VBox();
 

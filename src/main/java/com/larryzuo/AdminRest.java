@@ -22,7 +22,6 @@ public class AdminRest {
     VBox adminVbox;
 
     Connection myConn;
-    Statement myStmt;
     PreparedStatement PreStmt;
     ResultSet myRs;
     RadioButton[] adminRadioButton;
@@ -42,6 +41,10 @@ public class AdminRest {
 
     void createRestList(){
 
+        String hostName = "jdbc:mysql://35.225.192.66/cs370";
+        String userName = "yuezuo";
+        String passWord = "cs370";
+
         Button add = new Button("Add");
         Button delete = new Button("Delete");
         Button submit = new Button("Submit");
@@ -58,31 +61,19 @@ public class AdminRest {
         vbox1.setSpacing(10);
         VBox vbox2 = new VBox(hbox2);
 
-        ArrayList<String> restList = new ArrayList<>();
+        ArrayList<String> restList;
 
-        try{
-            myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370","yuezuo","cs370");
+        DataBaseConnection dataBaseConnection = new DataBaseConnection();
 
-            myStmt = myConn.createStatement();
+        dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-            myRs = myStmt.executeQuery("select * from restaurant");
+        String sql = "select * from restaurant";
 
-            while(myRs.next()){
+        restList = dataBaseConnection.getResultSet(sql,"rest_name");
 
-                String str = myRs.getString("rest_name");
+        adminRadioButton = new RadioButton[restList.size()];
 
-                restList.add(str);
-
-            }
-
-            adminRadioButton = new RadioButton[restList.size()];
-
-
-            myConn.close();
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        dataBaseConnection.connectionClose();
 
         ToggleGroup tg = new ToggleGroup();
 
@@ -104,7 +95,7 @@ public class AdminRest {
 
                     if(rb.isSelected()){
 
-                        AdminRestMenu adminMenu = new AdminRestMenu(rb.getText());
+                        new AdminRestMenu(rb.getText());
                     }
 
                 }
@@ -117,7 +108,7 @@ public class AdminRest {
             @Override
             public void handle(ActionEvent event) {
 
-                AddRestaurant getRest = new AddRestaurant(adminStage);
+                new AddRestaurant(adminStage);
 
             }
         });
