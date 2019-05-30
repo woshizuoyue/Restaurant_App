@@ -35,6 +35,10 @@ public class AdminRestMenu {
 
     public AdminRestMenu(String str){
 
+        String hostName = "jdbc:mysql://35.225.192.66/cs370";
+        String userName = "yuezuo";
+        String passWord = "cs370";
+
         restName = str;
         vbox = new VBox();
         scene = new Scene(vbox,500,600);
@@ -47,6 +51,8 @@ public class AdminRestMenu {
 
         ArrayList<String> itemStr = new ArrayList<>();
         ArrayList<String> infoStr = new ArrayList<>();
+
+        DataBaseConnection dataBaseConnection = new DataBaseConnection();
 
         Label restLabelName = new Label(restName);
 
@@ -64,52 +70,47 @@ public class AdminRestMenu {
         vbox.getChildren().addAll(hbox1,hbox2,hboxLabelName);
         vbox.setSpacing(10);
 
-        try{
+        dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-            myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370","yuezuo","cs370");
+        String preparedSQL = "select menu.dish_name, menu.dish_price " +
+                "from menu,restaurant,rest_menu " +
+                "where menu.dish_id = rest_menu.dish_id and " +
+                "rest_menu.rest_id = restaurant.rest_id and " +
+                "restaurant.rest_name = ? ";
+        String preparedSQL2 = "select rest_address, open_hour, close_hour,close_day " +
+                "from restaurant " +
+                "where rest_name = ? ";
 
-            myPreStmt = myConn.prepareStatement(
+        try {
 
-                    "select menu.dish_name, menu.dish_price " +
-                            "from menu,restaurant,rest_menu " +
-                            "where menu.dish_id = rest_menu.dish_id and " +
-                            "rest_menu.rest_id = restaurant.rest_id and " +
-                            "restaurant.rest_name = ? ");
+            dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
 
-            myPreStmt.setString(1,restName);
+            dataBaseConnection.PreStmt.setString(1,restName);
 
-            myRs = myPreStmt.executeQuery();
+            dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-            while (myRs.next()){
-
-                String menuName = myRs.getString("dish_name");
-                double price = myRs.getDouble("dish_price");
-
+            while(dataBaseConnection.myRs.next()){
+                String menuName = dataBaseConnection.myRs.getString("dish_name");
+                double price = dataBaseConnection.myRs.getDouble("dish_price");
                 itemStr.add(menuName+" ----------- "+price);
             }
 
-            myPreStmt = myConn.prepareStatement(
-                    "select rest_address, open_hour, close_hour,close_day " +
-                            "from restaurant " +
-                            "where rest_name = ? "
-            );
+            dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
 
-            myPreStmt.setString(1,restName);
+            dataBaseConnection.PreStmt.setString(1,restName);
 
-            myRs = myPreStmt.executeQuery();
+            dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-            while (myRs.next()){
-
-                String info = myRs.getString("rest_address")+" -------- "+"Open: "+myRs.getString("open_hour")+
-                        ", "+"Close: "+myRs.getString("close_hour")+
-                        ", "+"Close Day: "+myRs.getString("close_day");
-
+            while (dataBaseConnection.myRs.next()){
+                String info = dataBaseConnection.myRs.getString("rest_address")+" -------- "+"Open: "+
+                        dataBaseConnection.myRs.getString("open_hour")+
+                        ", "+"Close: "+dataBaseConnection.myRs.getString("close_hour")+
+                        ", "+"Close Day: "+dataBaseConnection.myRs.getString("close_day");
                 infoStr.add(info);
             }
 
-            myConn.close();
+            dataBaseConnection.connectionClose();
         }catch (Exception e){
-
             e.printStackTrace();
         }
 

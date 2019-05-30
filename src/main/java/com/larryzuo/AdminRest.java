@@ -87,6 +87,7 @@ public class AdminRest {
 
         // button group function;
 
+        // continued;
         submit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -97,19 +98,14 @@ public class AdminRest {
 
                         new AdminRestMenu(rb.getText());
                     }
-
                 }
-
-
             }
         });
 
         add.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
                 new AddRestaurant(adminStage);
-
             }
         });
 
