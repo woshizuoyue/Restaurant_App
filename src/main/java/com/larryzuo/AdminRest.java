@@ -24,6 +24,7 @@ public class AdminRest {
     Connection myConn;
     PreparedStatement PreStmt;
     ResultSet myRs;
+    DataBaseConnection dataBaseConnection;
     RadioButton[] adminRadioButton;
 
     public AdminRest(){
@@ -63,7 +64,7 @@ public class AdminRest {
 
         ArrayList<String> restList;
 
-        DataBaseConnection dataBaseConnection = new DataBaseConnection();
+        dataBaseConnection = new DataBaseConnection();
 
         dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
@@ -86,8 +87,6 @@ public class AdminRest {
         vbox1.getChildren().addAll(adminRadioButton);
 
         // button group function;
-
-        // continued;
         submit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {

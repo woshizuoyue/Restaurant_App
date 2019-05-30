@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +22,7 @@ public class AddDish {
     Scene scene;
     VBox vbox;
     String restName;
+
     int tempDishID;
     int restID;
 
@@ -29,12 +30,15 @@ public class AddDish {
     TextField txtDishName;
     TextField txtDishPrice;
 
-    Connection myConn;
-    PreparedStatement PreStmt;
-    Statement myStmt;
-    ResultSet myRs;
+    DataBaseConnection dataBaseConnection;
 
     public AddDish(String str, final Stage adminMenuStage){
+
+        final String hostName = "jdbc:mysql://35.225.192.66/cs370";
+        final String userName = "yuezuo";
+        final String passWord = "cs370";
+
+        dataBaseConnection = new DataBaseConnection();
 
         restName = str;
 
@@ -69,64 +73,55 @@ public class AddDish {
             @Override
             public void handle(ActionEvent event) {
 
+                String preparedSQL = "insert into menu( dish_id, dish_name, dish_price) " +
+                        "values(?,?,?)";
+                String preparedSQL2 = "select rest_id from restaurant " +
+                        "where rest_name like ?";
+                String preparedSQL3 = "insert into rest_menu " +
+                        "(rest_id, dish_id) " +
+                        "values(?,?)";
+
+                dataBaseConnection.connectionOpen(hostName,userName,passWord);
+
                 try {
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo", "cs370");
 
-                    PreStmt = myConn.prepareStatement(
-
-                            "insert into menu( dish_id, dish_name, dish_price) " +
-                                    "values(?,?,?)"
-                    );
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
 
                     tempDishID = Integer.parseInt(txtDishID.getText());
-                    PreStmt.setInt(1,tempDishID);
-                    PreStmt.setString(2,txtDishName.getText());
-                    PreStmt.setString(3,txtDishPrice.getText());
 
-                    PreStmt.executeUpdate();
+                    dataBaseConnection.PreStmt.setInt(1,tempDishID);
+                    dataBaseConnection.PreStmt.setString(2,txtDishName.getText());
+                    dataBaseConnection.PreStmt.setString(3,txtDishPrice.getText());
+
+                    dataBaseConnection.PreStmt.executeUpdate();
 
                     // add rest_id and dish_id into rest_menu table;
 
-                    PreStmt = myConn.prepareStatement(
-
-                            "select rest_id from restaurant " +
-                                    "where rest_name like ?"
-                    );
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
 
                     String tempRestName = restName.split("\\(")[0];
 
-                    PreStmt.setString(1,tempRestName+"%");
+                    dataBaseConnection.PreStmt.setString(1,tempRestName+"%");
 
-                    myRs = PreStmt.executeQuery();
+                    dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-                    while (myRs.next()) {
+                    while (dataBaseConnection.myRs.next()){
 
-                        restID = myRs.getInt("rest_id");
+                        restID = dataBaseConnection.myRs.getInt("rest_id");
 
-
-                        PreStmt = myConn.prepareStatement(
-
-                                "insert into rest_menu " +
-                                        "(rest_id, dish_id) " +
-                                        "values(?,?)"
-                        );
-
-                        PreStmt.setInt(1, restID);
-                        PreStmt.setInt(2, tempDishID);
-                        PreStmt.executeUpdate();
+                        dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL3);
+                        dataBaseConnection.PreStmt.setInt(1, restID);
+                        dataBaseConnection.PreStmt.setInt(2, tempDishID);
+                        dataBaseConnection.PreStmt.executeUpdate();
                     }
-
-                    myConn.close();
+                    dataBaseConnection.connectionClose();
                 }catch (Exception e){
                     e.printStackTrace();
                 }
 
                 stage.close();
                 adminMenuStage.close();
-
                 new AdminRestMenu(restName);
-
             }
         });
 
@@ -136,24 +131,20 @@ public class AddDish {
 
                 Set<Integer> tempSet = new HashSet<>();
 
-                try{
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo","cs370");
+                ArrayList<Integer> tempList;
 
-                    myStmt = myConn.createStatement();
+                String sql = "select dish_id from menu ";
 
-                    myRs = myStmt.executeQuery("select dish_id from menu ");
+                dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-                    while (myRs.next()){
+                tempList = dataBaseConnection.getIntegerResultSet(sql,"dish_id");
 
-                        tempSet.add(myRs.getInt("dish_id"));
-                    }
+                while (!tempList.isEmpty()){
 
-                    myConn.close();
-                }catch (Exception e){
-
-                    e.printStackTrace();
+                    tempSet.add(tempList.remove(0));
                 }
+
+                dataBaseConnection.connectionClose();
 
                 if(tempSet.contains(Integer.parseInt(txtDishID.getText()))){
 
@@ -165,19 +156,14 @@ public class AddDish {
                     JOptionPane.showMessageDialog(null, "No same dish_id in the list, " +
                             "it is works!");
                 }
-
             }
         });
-
-
 
         scene = new Scene(vbox,300,300);
         stage = new Stage();
         stage.setTitle("Dish Creation");
         stage.setScene(scene);
         stage.show();
-
     }
-
 
 }

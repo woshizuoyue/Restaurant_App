@@ -31,6 +31,7 @@ public class AdminRestMenu {
     Connection myConn;
     PreparedStatement myPreStmt;
     ResultSet myRs;
+    DataBaseConnection dataBaseConnection;
 
 
     public AdminRestMenu(String str){
@@ -52,7 +53,7 @@ public class AdminRestMenu {
         ArrayList<String> itemStr = new ArrayList<>();
         ArrayList<String> infoStr = new ArrayList<>();
 
-        DataBaseConnection dataBaseConnection = new DataBaseConnection();
+        dataBaseConnection = new DataBaseConnection();
 
         Label restLabelName = new Label(restName);
 
