@@ -36,9 +36,9 @@ public class AdminRestMenu {
 
     public AdminRestMenu(String str){
 
-        String hostName = "jdbc:mysql://35.225.192.66/cs370";
-        String userName = "yuezuo";
-        String passWord = "cs370";
+        final String hostName = "jdbc:mysql://35.225.192.66/cs370";
+        final String userName = "yuezuo";
+        final String passWord = "cs370";
 
         restName = str;
         vbox = new VBox();
@@ -171,61 +171,52 @@ public class AdminRestMenu {
 
                             int dishID = 0;
 
+                            String preparedSQL = "select dish_id from menu " +
+                                    "where dish_name =?";
+                            String preparedSQL2 = "delete from rest_menu " +
+                                    "where dish_id = ?";
+                            String preparedSQL3 = "select rest_id from rest_menu where dish_id = ?";
+
+                            String preparedSQL4 = "delete from menu where dish_id =?";
+
+                            dataBaseConnection.connectionOpen(hostName,userName,passWord);
+
                             try {
-                                myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                                        "yuezuo", "cs370");
-                                myPreStmt = myConn.prepareStatement(
-                                        "select dish_id from menu " +
-                                                "where dish_name = ?"
-                                );
+                                dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
+                                dataBaseConnection.PreStmt.setString(1, dishName);
+                                dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-                                myPreStmt.setString(1, dishName);
+                                while (dataBaseConnection.myRs.next()){
 
-                                myRs = myPreStmt.executeQuery();
-
-                                while (myRs.next()) {
-
-                                    dishID = myRs.getInt("dish_id");
+                                    dishID = dataBaseConnection.myRs.getInt("dish_id");
                                 }
 
-                                myPreStmt = myConn.prepareStatement(
-
-                                        "delete from rest_menu " +
-                                                "where dish_id = ?"
-                                );
-
-                                myPreStmt.setInt(1, dishID);
-
-                                myPreStmt.executeUpdate();
+                                dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
+                                dataBaseConnection.PreStmt.setInt(1,dishID);
+                                dataBaseConnection.PreStmt.executeUpdate();
 
                                 // check the all restaurants are still have the same dish with the deleted dish,
                                 // if yes, the deleted dish cannot be deleted from menu table,
                                 // if no, the deleted dish should be deleted from menu table.
 
-                                myPreStmt = myConn.prepareStatement(
-
-                                        "select rest_id from rest_menu " +
-                                                "where dish_id = ?"
-                                );
-
-                                myPreStmt.setInt(1, dishID);
-
-                                myRs = myPreStmt.executeQuery();
+                                dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL3);
+                                dataBaseConnection.PreStmt.setInt(1,dishID);
+                                dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
                                 // if no restaurant has the same dish
                                 // then delete the dish;
-                                if (!myRs.next()) {
 
-                                    myPreStmt = myConn.prepareStatement(
-                                            "delete from menu where dish_id = ?"
-                                    );
+                                if(!dataBaseConnection.myRs.next()){
 
-                                    myPreStmt.setInt(1, dishID);
+                                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL4);
 
-                                    myPreStmt.executeUpdate();
+                                    dataBaseConnection.PreStmt.setInt(1,dishID);
+
+                                    dataBaseConnection.PreStmt.executeUpdate();
                                 }
 
-                                myConn.close();
+                                dataBaseConnection.connectionClose();
+
                             }catch (Exception e){
                                 e.printStackTrace();
                             }
