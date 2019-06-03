@@ -17,6 +17,11 @@ public class RestMenu {
     VBox menuVBox;
 
     String restName;
+    DataBaseConnection dataBaseConnection;
+
+    final String hostName = "jdbc:mysql://35.225.192.66/cs370";
+    final String userName = "yuezuo";
+    final String passWord = "cs370";
 
     public RestMenu(String str){
 
@@ -41,11 +46,7 @@ public class RestMenu {
         ArrayList<String> itemStr = new ArrayList<>();
         ArrayList<String> infoStr = new ArrayList<>();
 
-        final String hostName = "jdbc:mysql://35.225.192.66/cs370";
-        final String userName = "yuezuo";
-        final String passWord = "cs370";
-
-        DataBaseConnection dataBaseConnection = new DataBaseConnection();
+        dataBaseConnection = new DataBaseConnection();
         dataBaseConnection.connectionOpen(hostName,userName,passWord);
         String preparedSQL = "select menu.dish_name, menu.dish_price " +
                 "from menu, restaurant, rest_menu " +
