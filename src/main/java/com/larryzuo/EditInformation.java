@@ -11,8 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.*;
-
 public class EditInformation {
 
     Stage stage;
@@ -28,37 +26,40 @@ public class EditInformation {
     String closeHour;
     String closeDay;
 
-    Connection myConn;
-    PreparedStatement PreStmt;
-    ResultSet myRs;
+    DataBaseConnection dataBaseConnection;
+
+    String hostName = "jdbc:mysql://35.225.192.66/cs370";
+    String userName = "yuezuo";
+    String passWord = "cs370";
+
 
     public EditInformation(String rn, final Stage adminStage){
 
         restName = rn;
+        dataBaseConnection = new DataBaseConnection();
+
+        dataBaseConnection.connectionOpen(hostName,userName,passWord);
+
+        String preparedSQL = "select open_hour, close_hour,close_day " +
+                "from restaurant " +
+                "where rest_name = ?";
 
         try{
-            myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                    "yuezuo","cs370");
 
-            PreStmt = myConn.prepareStatement(
+            dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
 
-                    "select open_hour, close_hour,close_day " +
-                            "from restaurant " +
-                            "where rest_name = ?"
-            );
+            dataBaseConnection.PreStmt.setString(1,restName);
 
-            PreStmt.setString(1,restName);
+            dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-            myRs = PreStmt.executeQuery();
+            while (dataBaseConnection.myRs.next()){
 
-            while (myRs.next()){
-
-                openHour = myRs.getString("open_hour");
-                closeHour = myRs.getString("close_hour");
-                closeDay = myRs.getString("close_day");
+                openHour = dataBaseConnection.myRs.getString("open_hour");
+                closeHour = dataBaseConnection.myRs.getString("close_hour");
+                closeDay = dataBaseConnection.myRs.getString("close_day");
             }
 
-            myConn.close();
+            dataBaseConnection.connectionClose();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -92,26 +93,25 @@ public class EditInformation {
             @Override
             public void handle(ActionEvent event) {
 
+                dataBaseConnection.connectionOpen(hostName,userName,passWord);
+
                 try {
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo", "cs370");
 
-                    PreStmt = myConn.prepareStatement(
+                    String preparedSQL2 = "update restaurant set rest_name = ?, " +
+                            "open_hour = ?, close_hour = ?, close_day = ? " +
+                            "where rest_name = ?";
 
-                            "update restaurant set rest_name = ?, " +
-                                    "open_hour = ?, close_hour = ?, close_day = ? " +
-                                    "where rest_name = ?"
-                    );
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
 
-                    PreStmt.setString(1,txtRestName.getText());
-                    PreStmt.setString(2,txtOpenHour.getText());
-                    PreStmt.setString(3,txtCloseHour.getText());
-                    PreStmt.setString(4,txtCloseDay.getText());
-                    PreStmt.setString(5,restName);
+                    dataBaseConnection.PreStmt.setString(1,txtRestName.getText());
+                    dataBaseConnection.PreStmt.setString(2,txtOpenHour.getText());
+                    dataBaseConnection.PreStmt.setString(3,txtCloseHour.getText());
+                    dataBaseConnection.PreStmt.setString(4,txtCloseDay.getText());
+                    dataBaseConnection.PreStmt.setString(5,restName);
 
-                    PreStmt.executeUpdate();
+                    dataBaseConnection.PreStmt.executeUpdate();
 
-                    myConn.close();
+                    dataBaseConnection.connectionClose();
                 }catch (Exception e){
 
                     e.printStackTrace();

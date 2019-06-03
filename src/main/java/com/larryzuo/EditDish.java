@@ -11,10 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-
 public class EditDish {
 
     Stage stage;
@@ -27,8 +23,10 @@ public class EditDish {
     String dishName;
     double dishPrice;
 
-    Connection myConn;
-    PreparedStatement PreStmt;
+    DataBaseConnection dataBaseConnection;
+    String hostName = "jdbc:mysql://35.225.192.66/cs370";
+    String userName = "yuezuo";
+    String passWord = "cs370";
 
 
     public EditDish(String rn, String dn, double dp, final Stage adminStage){
@@ -51,25 +49,27 @@ public class EditDish {
         HBox hboxEditButton = new HBox(EditButton);
         hboxEditButton.setAlignment(Pos.CENTER);
 
+        dataBaseConnection = new DataBaseConnection();
+
+        dataBaseConnection.connectionOpen(hostName,userName,passWord);
+
+        final String preparedSQL = "update menu set dish_name =? , dish_price = ? " +
+                "where dish_name = ?";
+
         EditButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo", "cs370");
 
-                    PreStmt = myConn.prepareStatement(
-                            "update menu set dish_name = ? , dish_price = ? " +
-                                    "where dish_name = ?"
-                    );
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
 
-                    PreStmt.setString(1,txtDishName.getText());
-                    PreStmt.setString(2,txtDishPrice.getText());
-                    PreStmt.setString(3,dishName);
+                    dataBaseConnection.PreStmt.setString(1,txtDishName.getText());
+                    dataBaseConnection.PreStmt.setString(2,txtDishPrice.getText());
+                    dataBaseConnection.PreStmt.setString(3,dishName);
 
-                    PreStmt.executeUpdate();
+                    dataBaseConnection.PreStmt.executeUpdate();
 
-                    myConn.close();
+                    dataBaseConnection.connectionClose();
                 }catch (Exception e){
                     e.printStackTrace();
                 }

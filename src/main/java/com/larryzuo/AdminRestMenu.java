@@ -13,10 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 
 public class AdminRestMenu {
@@ -28,9 +24,6 @@ public class AdminRestMenu {
     String restName = "";
     RadioButton[] menuRadioButton;
 
-    Connection myConn;
-    PreparedStatement myPreStmt;
-    ResultSet myRs;
     DataBaseConnection dataBaseConnection;
 
 
@@ -227,7 +220,6 @@ public class AdminRestMenu {
 
                     }
                 }
-
             }
         });
 
