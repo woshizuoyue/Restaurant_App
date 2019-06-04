@@ -28,12 +28,14 @@ public class AddRestaurant {
     TextField txtCloseHour;
     TextField txtCloseDay;
 
-    Connection myConn;
-    PreparedStatement PreStmt;
-    Statement myStmt;
-    ResultSet myRs;
+    DataBaseConnection dataBaseConnection;
+    String hostName = "jdbc:mysql://35.225.192.66/cs370";
+    String userName = "yuezuo";
+    String passWord = "cs370";
 
     public AddRestaurant(final Stage adminStage){
+
+        dataBaseConnection = new DataBaseConnection();
 
         Label labelRestXCoord = new Label("X coordinate: ");
         txtRestXCoord = new TextField();
@@ -76,26 +78,30 @@ public class AddRestaurant {
             @Override
             public void handle(ActionEvent event) {
 
+                dataBaseConnection.connectionOpen(hostName,userName,passWord);
+
+                String preparedSQL = "insert into restaurant (rest_id, rest_name, rest_address, open_hour, " +
+                        "close_hour, close_day) " +
+                        "values(?,?,?,?,?,?)";
+
                 try{
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370","yuezuo","cs370");
 
-                    PreStmt = myConn.prepareStatement(
-
-                            "insert into restaurant (rest_id, rest_name, rest_address, open_hour, close_hour,close_day) " +
-                                    "values (?,?,?,?,?,?)"
-                    );
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
                     int tempID = Integer.parseInt(txtRestXCoord.getText()+txtRestYCoord.getText());
                     String dash = "-";
                     String street = "St";
                     String temp_rest_address = txtRestXCoord.getText()+dash+txtRestYCoord.getText()+street;
-                    PreStmt.setInt(1, tempID);
-                    PreStmt.setString(2,txtRestName.getText());
-                    PreStmt.setString(3, temp_rest_address);
-                    PreStmt.setString(4,txtOpenHour.getText());
-                    PreStmt.setString(5,txtCloseHour.getText());
-                    PreStmt.setString(6,txtCloseDay.getText());
 
-                    PreStmt.executeUpdate();
+                    dataBaseConnection.PreStmt.setInt(1, tempID);
+                    dataBaseConnection.PreStmt.setString(2,txtRestName.getText());
+                    dataBaseConnection.PreStmt.setString(3, temp_rest_address);
+                    dataBaseConnection.PreStmt.setString(4,txtOpenHour.getText());
+                    dataBaseConnection.PreStmt.setString(5,txtCloseHour.getText());
+                    dataBaseConnection.PreStmt.setString(6,txtCloseDay.getText());
+
+                    dataBaseConnection.PreStmt.executeUpdate();
+
+                    dataBaseConnection.connectionClose();
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -137,22 +143,20 @@ public class AddRestaurant {
                 // if it is exist in hashset then pop up the warning message
 
                 try{
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo","cs370");
+                    dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-                    myStmt = myConn.createStatement();
+                    String sql = "select rest_id from restaurant ";
 
-                    myRs = myStmt.executeQuery(
+                    dataBaseConnection.myStmt = dataBaseConnection.myConn.createStatement();
 
-                            "select rest_id from restaurant "
-                    );
+                    dataBaseConnection.myRs = dataBaseConnection.myStmt.executeQuery(sql);
 
-                    while(myRs.next()){
+                    while(dataBaseConnection.myRs.next()){
 
-                        tempSet.add(myRs.getInt("rest_id"));
+                        tempSet.add(dataBaseConnection.myRs.getInt("rest_id"));
                     }
 
-                    myConn.close();
+                    dataBaseConnection.connectionClose();
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -161,11 +165,9 @@ public class AddRestaurant {
                         "It already have the same address in other restaurant, change the address");
 
                 else{
-
                     JOptionPane.showMessageDialog(null, "there is no same address in the list," +
                             "it is works!");
                 }
-
             }
         });
 
@@ -224,73 +226,73 @@ public class AddRestaurant {
             public void handle(ActionEvent event) {
 
                 try{
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo","cs370");
+                    dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-                    PreStmt = myConn.prepareStatement(
+                    String preparedSQL = "insert into restaurant (rest_id, rest_name, rest_address, open_hour, " +
+                            "close_day) values(?,?,?,?,?,?)";
 
-                            "insert into restaurant (rest_id, rest_name, rest_address, open_hour, close_hour,close_day) " +
-                                    "values (?,?,?,?,?,?)"
-                    );
+                    String preparedSQL2 = "select rest_id from restaurant " +
+                            "where rest_name = ?";
+
+                    String preparedSQL3 = "select dish_id from rest_menu " +
+                    "where rest_id = ?";
+
+                    String preparedSQL4 = "insert into rest_menu (rest_id, dish_id) " +
+                            "values(?,?)";
+
+
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
                     int tempID = Integer.parseInt(txtRestXCoord.getText()+txtRestYCoord.getText());
                     String dash = "-";
                     String street = "St";
                     String temp_rest_address = txtRestXCoord.getText()+dash+txtRestYCoord.getText()+street;
-                    PreStmt.setInt(1, tempID);
-                    PreStmt.setString(2,txtRestName.getText());
-                    PreStmt.setString(3, temp_rest_address);
-                    PreStmt.setString(4,txtOpenHour.getText());
-                    PreStmt.setString(5,txtCloseHour.getText());
-                    PreStmt.setString(6,txtCloseDay.getText());
+                    dataBaseConnection.PreStmt.setInt(1, tempID);
+                    dataBaseConnection.PreStmt.setString(2,txtRestName.getText());
+                    dataBaseConnection.PreStmt.setString(3, temp_rest_address);
+                    dataBaseConnection.PreStmt.setString(4,txtOpenHour.getText());
+                    dataBaseConnection.PreStmt.setString(5,txtCloseHour.getText());
+                    dataBaseConnection.PreStmt.setString(6,txtCloseDay.getText());
 
-                    PreStmt.executeUpdate();
+                    dataBaseConnection.PreStmt.executeUpdate();
 
                     // check each dish under the selectedStoreName
                     // and assgin dishes to a new store
 
                     int selectedStoreID = 0;
                     int tempDishID = 0;
-                    PreStmt = myConn.prepareStatement(
-                            "select rest_id from restaurant " +
-                                    "where rest_name = ? "
-                    );
 
-                    PreStmt.setString(1,selectStoreName);
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
 
-                    myRs = PreStmt.executeQuery();
+                    dataBaseConnection.PreStmt.setString(1,selectStoreName);
 
-                    while (myRs.next()){
+                    dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-                        selectedStoreID = myRs.getInt("rest_id");
+                    while (dataBaseConnection.myRs.next()){
+
+                        selectedStoreID = dataBaseConnection.myRs.getInt("rest_id");
 
                     }
 
-                    PreStmt = myConn.prepareStatement(
-                            "select dish_id from rest_menu " +
-                                    "where rest_id = ? "
-                    );
+                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL3);
 
-                    PreStmt.setInt(1,selectedStoreID);
+                    dataBaseConnection.PreStmt.setInt(1,selectedStoreID);
 
-                    myRs = PreStmt.executeQuery();
+                    dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
 
-                    while(myRs.next()){
+                    while(dataBaseConnection.myRs.next()){
 
-                        tempDishID = myRs.getInt("dish_id");
+                        tempDishID = dataBaseConnection.myRs.getInt("dish_id");
 
-                        PreStmt = myConn.prepareStatement(
-                                "insert into rest_menu (rest_id, dish_id) " +
-                                        "values(?,?)"
-                        );
+                        dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL4);
 
-                        PreStmt.setInt(1,tempID);
-                        PreStmt.setInt(2,tempDishID);
+                        dataBaseConnection.PreStmt.setInt(1,tempID);
+                        dataBaseConnection.PreStmt.setInt(2,tempDishID);
 
-                        PreStmt.executeUpdate();
+                        dataBaseConnection.PreStmt.executeUpdate();
 
                     }
 
-                    myConn.close();
+                    dataBaseConnection.connectionClose();
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -310,6 +312,8 @@ public class AddRestaurant {
                 String yCoordStr ="";
                 Set<Integer> tempSet = new HashSet<>();
                 int restID;
+
+                String preparedSQL5 = "select rest_id from restaurant";
 
                 if(txtRestXCoord.getText().charAt(0) == '0'){
                     xCoordStr = txtRestXCoord.getText().substring(1);
@@ -332,22 +336,18 @@ public class AddRestaurant {
                 // if it is exist in hashset then pop up the warning message
 
                 try{
-                    myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370",
-                            "yuezuo","cs370");
+                    dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-                    myStmt = myConn.createStatement();
+                    dataBaseConnection.myStmt = dataBaseConnection.myConn.createStatement();
 
-                    myRs = myStmt.executeQuery(
+                    dataBaseConnection.myRs = dataBaseConnection.myStmt.executeQuery(preparedSQL5);
 
-                            "select rest_id from restaurant "
-                    );
+                    while(dataBaseConnection.myRs.next()){
 
-                    while(myRs.next()){
-
-                        tempSet.add(myRs.getInt("rest_id"));
+                        tempSet.add(dataBaseConnection.myRs.getInt("rest_id"));
                     }
 
-                    myConn.close();
+                    dataBaseConnection.connectionClose();
                 }catch (Exception e){
                     e.printStackTrace();
                 }

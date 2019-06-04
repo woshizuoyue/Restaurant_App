@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class DataBaseConnection {
 
     public Connection myConn;
-    private Statement myStmt;
+    public Statement myStmt;
     public PreparedStatement PreStmt;
     public ResultSet myRs;
 
@@ -62,6 +62,7 @@ public class DataBaseConnection {
 
         return tempIntList;
     }
+
 
     void connectionClose(){
 
