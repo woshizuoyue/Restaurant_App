@@ -21,9 +21,6 @@ public class AdminRest {
     Scene adminScene;
     VBox adminVbox;
 
-    Connection myConn;
-    PreparedStatement PreStmt;
-    ResultSet myRs;
     DataBaseConnection dataBaseConnection;
     RadioButton[] adminRadioButton;
 
@@ -42,9 +39,9 @@ public class AdminRest {
 
     void createRestList(){
 
-        String hostName = "jdbc:mysql://35.225.192.66/cs370";
-        String userName = "yuezuo";
-        String passWord = "cs370";
+        final String hostName = "jdbc:mysql://35.225.192.66/cs370";
+        final String userName = "yuezuo";
+        final String passWord = "cs370";
 
         Button add = new Button("Add");
         Button delete = new Button("Delete");
@@ -121,23 +118,25 @@ public class AdminRest {
                         if(reply == JOptionPane.YES_OPTION){
 
                             try {
-                                myConn = DriverManager.getConnection("jdbc:mysql://52.14.102.120:3306/cs370", "yuezuo",
-                                        "cs370");
 
-                                PreStmt = myConn.prepareStatement(
+                                dataBaseConnection.connectionOpen(hostName,userName,passWord);
 
-                                        "select menu.dish_name, menu.dish_price " +
-                                                "from menu,restaurant,rest_menu " +
-                                                "where menu.dish_id = rest_menu.dish_id and " +
-                                                "rest_menu.rest_id = restaurant.rest_id and " +
-                                                "restaurant.rest_name = ? "
-                                );
+                                String preparedSQL = "select menu.dish_name, menu.dish_price " +
+                                        "from menu,restaurant,rest_menu " +
+                                        "where menu.dish_id = rest_menu.dish_id and " +
+                                        "rest_menu.rest_id = restaurant.rest_id and " +
+                                        "restaurant.rest_name = ? ";
 
-                                PreStmt.setString(1,rb.getText());
+                                String preparedSQL2 ="delete from restaurant " +
+                                        "where rest_name = ?";
 
-                                myRs = PreStmt.executeQuery();
+                                dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL);
 
-                                if(myRs.next()){
+                                dataBaseConnection.PreStmt.setString(1,rb.getText());
+
+                                dataBaseConnection.myRs = dataBaseConnection.PreStmt.executeQuery();
+
+                                if(dataBaseConnection.myRs.next()){
 
                                     // need edit;
                                     JOptionPane.showMessageDialog(null,"There are dishes inside " +
@@ -146,18 +145,15 @@ public class AdminRest {
 
                                 else{
 
-                                    PreStmt = myConn.prepareStatement(
-                                            "delete from restaurant " +
-                                                    "where rest_name = ?"
-                                    );
+                                    dataBaseConnection.PreStmt = dataBaseConnection.myConn.prepareStatement(preparedSQL2);
 
-                                    PreStmt.setString(1, rb.getText());
+                                    dataBaseConnection.PreStmt.setString(1, rb.getText());
 
-                                    PreStmt.executeUpdate();
+                                    dataBaseConnection.PreStmt.executeUpdate();
 
                                 }
 
-                                myConn.close();
+                                dataBaseConnection.connectionClose();
                             }catch (Exception e){
                                 e.printStackTrace();
                             }
