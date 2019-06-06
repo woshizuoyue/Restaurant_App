@@ -31,9 +31,10 @@ public class Main extends Application {
     HBox hboxSortButton;
     HBox hboxSortByLocation;
 
+    // userName and passWord is(...zuo, ..370);
     final String hostName = "jdbc:mysql://35.225.192.66/cs370";
-    final String userName = "yuezuo";
-    final String passWord = "cs370";
+    final String userName = "yue";
+    final String passWord = "cs";
     private DataBaseConnection dataConnction;
 
     @Override
