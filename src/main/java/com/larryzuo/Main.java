@@ -1,5 +1,6 @@
 package com.larryzuo;
 
+import com.larryzuo.view.mainmenu.MainMenu;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class Main extends Application {
-
 
     private VBox myVBox;
     private HBox myHBox;
@@ -40,40 +40,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        primaryStage.setTitle("Restaurant Application");
-
-        Menu startMenu = new Menu("Start");
-        Menu quitMenu = new Menu("Quit");
-
-        MenuItem customItem = new MenuItem("Custom");
-        MenuItem adminItem = new MenuItem("Admin");
-        MenuItem exit = new MenuItem("Exit");
-
-        startMenu.getItems().addAll(customItem,adminItem);
-        quitMenu.getItems().add(exit);
-
-        customItem.setOnAction(new CustAction());
-        adminItem.setOnAction(new AdminAction());
-        quitMenu.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Platform.exit();
-            }
-        });
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(startMenu,quitMenu);
-
-        rootPane = new Pane();
-        myVBox = new VBox(2);
-
-        myVBox.getChildren().add(menuBar);
-
-        rootPane.getChildren().addAll(myVBox);
-        myScene = new Scene(rootPane,600,400);
-        primaryStage.setScene(myScene);
-        primaryStage.show();
-        myStage = primaryStage;
+        MainMenu mainMenu = MainMenu.getInstance();
+        mainMenu.setMainMenu(primaryStage);
     }
 
     // custom window;
