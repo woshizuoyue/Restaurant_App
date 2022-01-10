@@ -53,13 +53,15 @@ public class Main extends Application {
 
         @Override
         public void handle(ActionEvent event){
-
+            /*
             myStack.push(myVBox);
             myVBox = new VBox();
             myVBox.setPadding(new Insets(10,10,10,10));
             myVBox.setStyle("-fx-border-color: gray");
             myHBox = new HBox(3);
             rootPane = new Pane();
+
+             */
 
 
             //Buttons group;
@@ -345,19 +347,23 @@ public class Main extends Application {
                 }
             });
 
+            // need to add items
             myHBox.getChildren().addAll(cust_back,sortByNameAsc,sortByNameDesc);
-            myVBox.getChildren().add(myHBox);
+            //myVBox.getChildren().add(myHBox);
             myVBox.getChildren().add(hboxSortByLocation);
             myVBox.getChildren().add(hboxSortButton);
             myVBox.getChildren().addAll(radioButtons);
             myVBox.getChildren().add(submit);
 
+            /*
             rootPane.getChildren().add(myVBox);
 
             myScene = new Scene(rootPane,400,600);
 
             myStage.setScene(myScene);
             myStage.show();
+
+             */
 
         }
 

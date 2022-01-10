@@ -16,10 +16,10 @@ public class MainMenu {
 
     private static MainMenu mainMenu = new MainMenu();
 
-    private VBox myVBox;
-    private HBox myHBox;
-    private Stage myStage;
-    private Scene myScene;
+    private VBox vBox;
+    private HBox hBox;
+    private Stage stage;
+    private Scene scene;
     private Pane rootPane;
 
     private MainMenu(){};
@@ -47,7 +47,7 @@ public class MainMenu {
         AdminAction adminAction = new AdminAction();
 
         customItem.setOnAction(custAction);
-        adminItem.setOnAction(new AdminAction());
+        adminItem.setOnAction(adminAction);
         quitMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -59,14 +59,55 @@ public class MainMenu {
         menuBar.getMenus().addAll(startMenu,quitMenu);
 
         rootPane = new Pane();
-        myVBox = new VBox(2);
+        vBox = new VBox(2);
 
-        myVBox.getChildren().add(menuBar);
+        vBox.getChildren().add(menuBar);
 
-        rootPane.getChildren().addAll(myVBox);
-        myScene = new Scene(rootPane,600,400);
-        primaryStage.setScene(myScene);
+        rootPane.getChildren().addAll(vBox);
+        scene = new Scene(rootPane,600,400);
+        primaryStage.setScene(scene);
         primaryStage.show();
-        myStage = primaryStage;
+        stage = primaryStage;
     }
+
+    public VBox getvBox() {
+        return vBox;
+    }
+
+    public void setvBox(VBox vBox) {
+        this.vBox = vBox;
+    }
+
+    public HBox gethBox() {
+        return hBox;
+    }
+
+    public void sethBox(HBox hBox) {
+        this.hBox = hBox;
+    }
+
+    public Pane getRootPane() {
+        return rootPane;
+    }
+
+    public void setRootPane(Pane rootPane) {
+        this.rootPane = rootPane;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
 }
